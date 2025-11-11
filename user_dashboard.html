@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard User - RubikInvest</title>
+  <style>
+    :root {
+      --blue-600:#2563eb; --blue-700:#1e40af; --bg:linear-gradient(135deg,#eff6ff,#ffffff); --card:#ffffff; --radius:12px;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    body{margin:0;min-height:100vh;background:var(--bg);color:#0f172a;}
+    header{background:linear-gradient(90deg,var(--blue-600),var(--blue-700));color:white;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}
+    .brand{font-weight:700;font-size:20px;}
+    .container{max-width:960px;margin:20px auto;padding:0 16px;}
+    .card{background:var(--card);padding:20px;border-radius:var(--radius);box-shadow:0 6px 18px rgba(2,6,23,0.08);margin-bottom:16px;}
+    button{padding:8px 14px;border-radius:8px;border:0;cursor:pointer;font-weight:600;}
+    .btn-primary{background:var(--blue-600);color:white;}
+    .btn-ghost{background:transparent;border:1px solid #e2e8f0;color:var(--blue-700);}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;}
+    th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left;}
+    .status{padding:4px 8px;border-radius:999px;font-size:12px;font-weight:600;}
+    .sukses{background:#dcfce7;color:#166534;}
+    .pending{background:#fef9c3;color:#854d0e;}
+    .footer{text-align:center;color:#64748b;margin-top:20px;font-size:13px;}
+    input{padding:8px;border-radius:8px;border:1px solid #dbeafe;width:100%;margin-bottom:10px;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">RubikInvest</div>
+    <button class="btn-ghost" onclick="logout()">Logout</button>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>Selamat Datang, <span id="userName">Yoharni</span></h2>
+      <p>Saldo Anda saat ini:</p>
+      <h1 id="saldo" style="color:var(--blue-700)">Rp 5.250.000</h1>
+      <button class="btn-primary" onclick="openTopup()">+ Top-Up Sekarang</button>
+    </div>
+
+    <div class="card">
+      <h3>Riwayat Transaksi</h3>
+      <table id="transTable">
+        <thead>
+          <tr><th>Tanggal</th><th>Produk</th><th>Jumlah</th><th>Status</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <p>Perlu bantuan? Hubungi kami langsung di WhatsApp 👇</p>
+      <a href="https://wa.me/628786000636" target="_blank">
+        <button class="btn-primary">Chat Admin (0878-6000-636)</button>
+      </a>
+    </div>
+
+    <div class="footer">RubikInvest • Dashboard User (Demo)</div>
+  </div>
+
+  <div id="modal" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.4)"></div>
+
+  <script>
+    const transactions=[
+      {date:'2025-11-10',product:'Reksa Dana Pasar Uang',amount:500000,status:'sukses'},
+      {date:'2025-11-11',product:'Top-Up Saldo',amount:250000,status:'pending'}
+    ];
+
+    const fmt=n=>n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
+
+    function renderTrans(){
+      const tbody=document.querySelector('#transTable tbody');
+      tbody.innerHTML='';
+      transactions.slice().reverse().forEach(t=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${t.date}</td><td>${t.product}</td><td>Rp ${fmt(t.amount)}</td><td><span class="status ${t.status}">${t.status}</span></td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openTopup(){
+      const modal=document.getElementById('modal');
+      modal.style.display='flex';
+      modal.innerHTML=`<div style="background:white;padding:20px;border-radius:12px;max-width:400px;width:90%">
+        <h3>Top-Up Saldo</h3>
+        <p>Transfer ke rekening berikut:</p>
+        <p><strong>BRI Yoharni</strong><br>0135-0103-0318-531</p>
+        <input id='topupAmount' type='number' placeholder='Masukkan jumlah top-up (Rp)' />
+        <div style='display:flex;gap:8px;justify-content:flex-end;'>
+          <button class='btn-ghost' onclick='closeModal()'>Batal</button>
+          <button class='btn-primary' onclick='submitTopup()'>Kirim</button>
+        </div>
+      </div>`;
+    }
+
+    function submitTopup(){
+      const amount=parseInt(document.getElementById('topupAmount').value||0);
+      if(!amount){alert('Masukkan nominal top-up');return;}
+      const today=new Date().toISOString().slice(0,10);
+      transactions.push({date:today,product:'Top-Up Saldo',amount:amount,status:'pending'});
+      closeModal();
+      renderTrans();
+      alert('Top-Up berhasil dikirim dan menunggu konfirmasi admin.');
+    }
+
+    function closeModal(){document.getElementById('modal').style.display='none';}
+    function logout(){alert('Anda telah logout.');}
+
+    renderTrans();
+  </script>
+</body>
+</html>
